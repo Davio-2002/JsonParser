@@ -30,7 +30,6 @@ JsonParser/
 │   │   └── FileReader.hpp   # FileReader definition
 ├── tests/
 │   ├── TokenizerTests.cpp   # Unit tests for Tokenizer
-│   ├── ParserTests.cpp      # Unit tests for Parser
-│   └── FileReaderTests.cpp  # Unit tests for FileReader
+│   └── ParserTests.cpp      # Unit tests for Parser
 ├── CMakeLists.txt           # Build system definition
 └── README.md                # Project documentation
