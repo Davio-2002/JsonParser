@@ -25,7 +25,7 @@ private:
 
 class Parser {
 public:
-    explicit Parser(const Tokenizer &tokenizer);
+    explicit Parser(const std::vector<Token>& tokens);
 
     std::shared_ptr<JsonValue> parse();
 
