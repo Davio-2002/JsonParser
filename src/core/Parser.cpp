@@ -1,7 +1,16 @@
 #include <core/Parser.hpp>
+#include <core/FileReader.hpp>
 #include <iostream>
 
-Parser::Parser(const std::vector<Token> &tokens): tokens_(tokens) {
+Parser::Parser(std::vector<Token> &tokens): tokens_(tokens) {
+}
+
+Parser::Parser(const std::string &inputOrFilePath, const bool isFile)
+    : tokens_([&]() {
+        const std::string jsonInput = isFile ? FileReader::read(inputOrFilePath) : inputOrFilePath;
+        Tokenizer tokenizer(jsonInput);
+        return tokenizer.tokenize();
+    }()) {
 }
 
 std::shared_ptr<JsonValue> Parser::parse() {
@@ -25,6 +34,7 @@ std::shared_ptr<JsonValue> Parser::parseValue() {
         default: throw std::runtime_error("Unexpected token:" + token.value);
     }
 }
+
 
 JsonObject Parser::parseObject() {
     expect(TokenType::LeftBrace);

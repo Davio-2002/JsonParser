@@ -16,7 +16,9 @@ find_package(GTest REQUIRED)
 file(GLOB_RECURSE CORE_SRC src/core/*.cpp)
 file(GLOB_RECURSE MODEL_SRC src/model/*.cpp)
 
-set(MAIN_SRC src/main.cpp)
+set(MAIN_SRC src/main.cpp
+        include/core/FileReader.hpp
+        src/core/FileReader.cpp)
 
 add_executable(JsonParser ${MAIN_SRC} ${CORE_SRC} ${MODEL_SRC})
 

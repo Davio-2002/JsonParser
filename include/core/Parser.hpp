@@ -26,7 +26,8 @@ private:
 
 class Parser {
 public:
-    explicit Parser(const std::vector<Token>& tokens);
+    explicit Parser(std::vector<Token>& tokens);
+    explicit Parser(const std::string& inputOrFilePath, bool isFile = false);
 
     std::shared_ptr<JsonValue> parse();
 
@@ -52,6 +53,6 @@ private:
     void expect(TokenType type);
 
 private:
-    const std::vector<Token>& tokens_;
+    Tokenizer::TokenVector tokens_;
     size_t currentIndex_{};
 };

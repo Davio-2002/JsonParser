@@ -37,31 +37,25 @@ namespace {
     }
 }
 
-int main() {
-    const std::string json = R"(
-        {
-            "name": "Alice",
-            "age": 30,
-            "isStudent": false,
-            "subjects": ["Math", "Physics"],
-            "details": {
-                "hobby": "reading",
-                "graduated": true
-            }
-        }
-    )";
-
+int main(const int argc, char* argv[]) {
     try {
-        Tokenizer tokenizer(json);
-        const auto tokens = tokenizer.tokenize();
+        if (argc < 2) {
+            std::cerr << "Usage: " << argv[0] << " <json_string_or_file_path> [--file]\n";
+            return 1;
+        }
 
-        Parser parser(tokens);
+        std::string input = argv[1];
+        const bool isFile = (argc == 3 && std::string(argv[2]) == "--file");
+
+        Parser parser(input, isFile);
         const auto root = parser.parse();
 
         std::cout << "Parsed JSON structure:\n";
         printJson(root);
+
     } catch (const std::exception& ex) {
         std::cerr << "Error: " << ex.what() << std::endl;
+        return 1;
     }
 
     return 0;

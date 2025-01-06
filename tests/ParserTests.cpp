@@ -1,21 +1,37 @@
 #include <gtest/gtest.h>
 #include <core/Parser.hpp>
+#include <fstream>
+#include <sstream>
+#include <filesystem>
+
+namespace fs = std::filesystem;
+
+namespace {
+    void createTestFile(const std::string& filePath, const std::string& content) {
+        std::ofstream file(filePath);
+        if (!file.is_open()) {
+            throw std::runtime_error("Failed to create test file: " + filePath);
+        }
+        file << content;
+        file.close();
+    }
+}
 
 class ParserTestFixture : public ::testing::Test {
 protected:
     void SetUp() override {
     }
 
-    std::shared_ptr<JsonValue> parseJson(const std::string &json) {
+    std::shared_ptr<JsonValue> parseJson(std::string &json) {
         Tokenizer tokenizer(json);
-        const auto tokens = tokenizer.tokenize();
+        auto tokens = tokenizer.tokenize();
         Parser parser(tokens);
         return parser.parse();
     }
 };
 
 TEST_F(ParserTestFixture, SimpleTypes) {
-    const std::string json = R"(
+    std::string json = R"(
         {
             "string": "value",
             "number": 42,
@@ -24,10 +40,10 @@ TEST_F(ParserTestFixture, SimpleTypes) {
         }
     )";
 
-    const auto root = parseJson(json);
+    auto root = parseJson(json);
 
     ASSERT_TRUE(std::holds_alternative<JsonObject>(root->value()));
-    const auto &obj = std::get<JsonObject>(root->value());
+    auto &obj = std::get<JsonObject>(root->value());
 
     ASSERT_EQ(obj.size(), 4);
     EXPECT_EQ(std::get<std::string>(obj.at("string")->value()), "value");
@@ -37,7 +53,7 @@ TEST_F(ParserTestFixture, SimpleTypes) {
 }
 
 TEST_F(ParserTestFixture, NestedObject) {
-    const std::string json = R"(
+    std::string json = R"(
         {
             "nested": {
                 "key": "value",
@@ -46,26 +62,26 @@ TEST_F(ParserTestFixture, NestedObject) {
         }
     )";
 
-    const auto root = parseJson(json);
+    auto root = parseJson(json);
 
     ASSERT_TRUE(std::holds_alternative<JsonObject>(root->value()));
-    const auto &obj = std::get<JsonObject>(root->value());
+    auto &obj = std::get<JsonObject>(root->value());
 
     ASSERT_TRUE(std::holds_alternative<JsonObject>(obj.at("nested")->value()));
-    const auto &nestedObj = std::get<JsonObject>(obj.at("nested")->value());
+    auto &nestedObj = std::get<JsonObject>(obj.at("nested")->value());
     EXPECT_EQ(std::get<std::string>(nestedObj.at("key")->value()), "value");
     EXPECT_EQ(std::get<double>(nestedObj.at("number")->value()), 123);
 }
 
 TEST_F(ParserTestFixture, Array) {
-    const std::string json = R"(
+    std::string json = R"(
         [1, "text", false, null, {"key": "value"}]
     )";
 
     const auto root = parseJson(json);
 
     ASSERT_TRUE(std::holds_alternative<JsonArray>(root->value()));
-    const auto &array = std::get<JsonArray>(root->value());
+    auto &array = std::get<JsonArray>(root->value());
 
     ASSERT_EQ(array.size(), 5);
     EXPECT_EQ(std::get<double>(array[0]->value()), 1);
@@ -74,12 +90,12 @@ TEST_F(ParserTestFixture, Array) {
     EXPECT_EQ(std::get<std::nullptr_t>(array[3]->value()), nullptr);
 
     ASSERT_TRUE(std::holds_alternative<JsonObject>(array[4]->value()));
-    const auto &obj = std::get<JsonObject>(array[4]->value());
+    auto &obj = std::get<JsonObject>(array[4]->value());
     EXPECT_EQ(std::get<std::string>(obj.at("key")->value()), "value");
 }
 
 TEST_F(ParserTestFixture, LargeNestedObject) {
-    const std::string json = R"(
+    std::string json = R"(
         {
             "user": {
                 "id": 123,
@@ -128,11 +144,11 @@ TEST_F(ParserTestFixture, LargeNestedObject) {
 }
 
 TEST_F(ParserTestFixture, MixedArrayTypes) {
-    const std::string json = R"(
+    std::string json = R"(
         [42, "string", true, null, [1, 2, 3], {"key": "value"}]
     )";
 
-    auto root = parseJson(json);
+    const auto root = parseJson(json);
 
     ASSERT_TRUE(std::holds_alternative<JsonArray>(root->value()));
     const auto& array = std::get<JsonArray>(root->value());
@@ -157,4 +173,46 @@ TEST_F(ParserTestFixture, MixedArrayTypes) {
     EXPECT_EQ(std::get<std::string>(nestedObject.at("key")->value()), "value");
 }
 
+TEST(ParserTests, ParseFromFile) {
+    std::string filePath = "test_file.json";
+    std::string jsonContent = R"({
+        "city": "New York",
+        "population": 8419000,
+        "coordinates": [40.7128, -74.0060]
+    })";
 
+    createTestFile(filePath, jsonContent);
+
+    Parser parser(filePath, true);
+    auto root = parser.parse();
+
+    ASSERT_TRUE(std::holds_alternative<JsonObject>(root->value()));
+    auto& obj = std::get<JsonObject>(root->value());
+
+    EXPECT_EQ(std::get<std::string>(obj.at("city")->value()), "New York");
+    EXPECT_EQ(std::get<double>(obj.at("population")->value()), 8419000);
+
+    auto& coords = std::get<JsonArray>(obj.at("coordinates")->value());
+    ASSERT_EQ(coords.size(), 2);
+    EXPECT_EQ(std::get<double>(coords[0]->value()), 40.7128);
+    EXPECT_EQ(std::get<double>(coords[1]->value()), -74.0060);
+
+    std::filesystem::remove(filePath);
+}
+
+TEST(ParserTests, InvalidFilePath) {
+    EXPECT_THROW(Parser("nonexistent_file.json", true), std::runtime_error);
+}
+
+TEST(ParserTests, InvalidJsonInFile) {
+    std::string filePath = "invalid_file.json";
+    std::string invalidJson = R"({
+        "key": "value", "missing_end
+    )";
+
+    createTestFile(filePath, invalidJson);
+
+    EXPECT_THROW(Parser(filePath, true), std::runtime_error);
+
+    std::filesystem::remove(filePath);
+}
