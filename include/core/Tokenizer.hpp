@@ -13,7 +13,7 @@ enum class TokenType {
     Comma,
     Colon,
     String,
-    NUmber,
+    Number,
     Boolean,
     Null,
     Unknown
@@ -36,7 +36,7 @@ private:
     std::string input;
     size_t currentIndex{};
 
-    char peek();
+    [[nodiscard]] char peek() const;
     char advance();
     void skipWhiteSpace();
 
