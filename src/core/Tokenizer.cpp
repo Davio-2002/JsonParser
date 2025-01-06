@@ -1,5 +1,4 @@
 #include <core/Tokenizer.hpp>
-#include <utility>
 
 Tokenizer::Tokenizer(std::string json) : input{std::move(json)}, currentIndex{0} {
 }
