@@ -1,4 +1,14 @@
 #include <core/Tokenizer.hpp>
+#include <iostream>
+
+namespace {
+    void printTokens(const std::vector<Token>& tokens) {
+        for (const auto& token : tokens) {
+            std::cout << "Token: Type = " << static_cast<int>(token.type)
+                      << ", Value = " << token.value << std::endl;
+        }
+    }
+}
 
 Tokenizer::Tokenizer(std::string json) : input{std::move(json)}, currentIndex{0} {
 }
@@ -80,21 +90,16 @@ Token Tokenizer::parseNumber() {
 
 Token Tokenizer::parseKeyword() {
     std::string result;
+
     while (currentIndex < input.size() && isalpha(peek())) {
         result += advance();
     }
 
-    if (result == "true") {
-        return Token(TokenType::Boolean, "true");
+    if (result == "true" || result == "false") {
+        return Token(TokenType::Boolean, result);
+    } else if (result == "null") {
+        return Token(TokenType::Null, result);
+    } else {
+        throw std::runtime_error("Invalid keyword: " + result);
     }
-
-    if (result == "false") {
-        return Token(TokenType::Boolean, "false");
-    }
-
-    if (result == "null") {
-        return Token(TokenType::Null, "null");
-    }
-
-    return Token(TokenType::Unknown, result);
 }
