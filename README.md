@@ -1,6 +1,6 @@
 # JSON Parser
 
-A powerful and lightweight **JSON Parser** implemented in modern **C++20**. This parser can handle JSON strings and JSON files, converting them into structured data. It supports objects, arrays, strings, numbers, booleans, and null values.
+A powerful and lightweight **JSON Parser** implemented in modern **C++**. This parser can handle JSON strings and JSON files, converting them into structured data. It supports objects, arrays, strings, numbers, booleans, and null values.
 
 ## **Features**
 
