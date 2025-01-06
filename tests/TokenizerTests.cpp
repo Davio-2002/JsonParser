@@ -25,9 +25,9 @@ TEST(TokenizerTest, SimpleObject) {
     EXPECT_EQ(tokens[0].type, TokenType::LeftBrace);
     EXPECT_EQ(tokens[1].type, TokenType::String);  // "key"
     EXPECT_EQ(tokens[1].value, "key");
-    EXPECT_EQ(tokens[10].type, TokenType::Colon); // true
+    EXPECT_EQ(tokens[10].type, TokenType::Colon); // colon
     EXPECT_EQ(tokens[10].value, ":");
-    EXPECT_EQ(tokens[14].type, TokenType::Colon);   // null
+    EXPECT_EQ(tokens[14].type, TokenType::Colon);   // colon
     EXPECT_EQ(tokens[14].value, ":");
 }
 
