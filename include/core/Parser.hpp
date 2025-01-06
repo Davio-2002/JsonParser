@@ -19,6 +19,17 @@ public:
 
     const ValueType &value() const { return value_; }
 
+private:
+    ValueType value_;
+};
+
+class Parser {
+public:
+    explicit Parser(const Tokenizer &tokenizer);
+
+    std::shared_ptr<JsonValue> parse();
+
+private:
     std::shared_ptr<JsonValue> parseValue();
 
     JsonObject parseObject();
@@ -33,12 +44,13 @@ public:
 
     std::nullptr_t parseNull();
 
-    const Token &peek() const;
+    [[nodiscard]] const Token &peek() const;
 
     const Token &advance();
 
     void expect(TokenType type);
 
 private:
-    ValueType value_;
+    const std::vector<Token>& tokens_;
+    size_t currentIndex_{};
 };
