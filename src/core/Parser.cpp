@@ -1,4 +1,5 @@
 #include <core/Parser.hpp>
+#include <iostream>
 
 Parser::Parser(const std::vector<Token> &tokens): tokens_(tokens) {
 }

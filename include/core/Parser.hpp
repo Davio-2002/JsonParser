@@ -1,6 +1,8 @@
 #pragma once
 
 #include <core/Tokenizer.hpp>
+#include <core/Parser.hpp>
+
 #include <memory>
 #include <variant>
 #include <unordered_map>
@@ -16,7 +18,6 @@ public:
 
     explicit JsonValue(ValueType v) : value_(std::move(v)) {
     }
-
     const ValueType &value() const { return value_; }
 
 private:
