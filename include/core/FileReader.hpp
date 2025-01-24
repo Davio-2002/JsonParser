@@ -19,7 +19,3 @@ struct FileReader {
      */
     static std::string read(const std::string& path);
 };
-
-struct FileReader {
-    static std::string read(const std::string& path);
-};
