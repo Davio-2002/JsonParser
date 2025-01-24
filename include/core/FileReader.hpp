@@ -9,7 +9,7 @@
  * This class provides a static method to read the contents of a file
  * given its file path. The contents are returned as a string.
  */
-struct FileReader {
+class FileReader {
     /**
      * @brief Reads the contents of a file.
      * 
