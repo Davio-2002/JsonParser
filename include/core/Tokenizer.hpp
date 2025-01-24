@@ -18,11 +18,23 @@ enum class TokenType {
     Unknown
 };
 
+/**
+ * @brief Represents a token in the tokenizer.
+ * 
+ * A token consists of a type and a value. The type indicates the kind of token
+ * (e.g., string, number, etc.), and the value holds the actual content of the token.
+ */
 struct Token {
-    TokenType type;
-    std::string value;
+    TokenType type; ///< The type of the token.
+    std::string value; ///< The value of the token.
     
-    explicit Token(const TokenType t, std::string  v) : type(t), value(std::move(v)) {}
+    /**
+     * @brief Constructs a Token with the specified type and value.
+     * 
+     * @param t The type of the token.
+     * @param v The value of the token.
+     */
+    explicit Token(const TokenType t, std::string v) : type(t), value(std::move(v)) {}
 };
 
 class Tokenizer {
